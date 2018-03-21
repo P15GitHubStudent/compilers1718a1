@@ -1,79 +1,81 @@
 
-def getchar(words,pos):
-	""" returns char at pos of words, or None if out of bounds """
+def getchar(words, pos):
+    """ returns char at pos of words, or None if out of bounds """
 
-	if pos<0 or pos>=len(words): return None
+    if pos < 0 or pos >= len(words):
+        return None
 
-	return words[pos]
-	
+    if words[pos] == ':' or words[pos] == '.':
+        return "TSEP"
+    elif words[pos] >= "0":
+                if words[pos] <= "1":
+                    return "RONE" # RANGE FROM 0-1
+                elif words[pos] == "2":
+                    return "TWO"
+                elif words[pos] == "3":
+                    return "THREE"
+                elif words[pos] <= "5":
+                    return "RFIVE"
+                elif words[pos] <= "9":
+                    return "ODIGIT"
+    else:
+        return None
 
-def scan(text,transition_table,accept_states):
-	""" Scans `text` while transitions exist in 'transition_table'.
-	After that, if in a state belonging to `accept_states`,
-	returns the corresponding token, else ERROR_TOKEN.
-	"""
-	
-	# initial state
-	pos = 0
-	state = 'q0'
-	
-	while True:
-		
-		c = getchar(text,pos)	# get next char
-		
-		if state in transition_table and c in transition_table[state]:
-		
-			state = transition_table[state][c]	# set new state
-			pos += 1	# advance to next char
-			
-		else:	# no transition found
 
-			# check if current state is accepting
-			if state in accept_states:
-				return accept_states[state],pos
+def scan(text, transition_table, accept_states):
+    """ Scans `text` while transitions exist in 'transition_table'.
+    After that, if in a state belonging to `accept_states`,
+    returns the corresponding token, else ERROR_TOKEN.
+    """
+    # initial state
+    pos = 0
+    state = 'q0'
 
-			# current state is not accepting
-			return 'ERROR_TOKEN',pos
-			
-	
-# the transition table, as a dictionary
+    while True:
 
-# Αντικαταστήστε με το δικό σας λεξικό μεταβάσεων...
-td = { 'q0':{ 't':'q1','l':'q2' },
-       'q1':{ 'e':'q3' },
-       'q2':{ 'o':'q8' },
-       'q3':{ 's':'q4','r':'q6' },
-       'q4':{ 't':'q5' },
-       'q6':{ 'm':'q7' },
-       'q8':{ 'n':'q9' },
-       'q9':{ 'g':'q10'}
-     } 
+        c = getchar(text, pos)  # get nex# t char
+
+       # print('c=', c)
+
+        if state in transition_table and c in transition_table[state]:
+
+            state = transition_table[state][c]  # set new state
+            pos += 1  # advance to next char
+
+        else:  # no transition found
+            print('state=', state)
+            # check if current state is accepting
+            if state in accept_states:
+                return accept_states[state], pos
+
+            # current state is not accepting
+            return 'ERROR_TOKEN', pos
+
+td = {'q0': {'RONE': 'q1', 'TWO': 'q2', 'THREE':'q3', 'RFIVE': 'q3', 'ODIGIT': 'q3'},
+      'q1': {'RONE': 'q3', 'TWO': 'q3', 'THREE': 'q3', 'RFIVE': 'q3', 'ODIGIT': 'q3', 'TSEP': 'q4'},
+      'q2': {'RONE': 'q3', 'TWO': 'q3', 'THREE': 'q3', 'TSEP': 'q4'},
+      'q3': {'TSEP': 'q4'},
+      'q4': {'RONE': 'q5', 'TWO': 'q5', 'THREE': 'q5', 'RFIVE': 'q5'},
+      'q5': {'RONE': 'q6', 'TWO': 'q6', 'THREE': 'q6', 'RFIVE': 'q6', 'ODIGIT': 'q6'}
+      }
 
 # the dictionary of accepting states and their
 # corresponding token
-
-# Αντικαταστήστε με το δικό σας λεξικό καταστάσεων αποδοχής...
-ad = { 'q5':'TEST_TOKEN',
-       'q7':'TERM_TOKEN',
-       'q10':'LONG_TOKEN'
-     }
-
-
+ad = {'q6': 'TIME_TOKEN'}
 # get a string from input
 text = input('give some input>')
 
 # scan text until no more input
-while text:	# that is, while len(text)>0
-	
-	# get next token and position after last char recognized
-	token,position = scan(text,td,ad)
-	
-	if token=='ERROR_TOKEN':
-		print('unrecognized input at pos',position+1,'of',text)
-		break
-	
-	print("token:",token,"string:",text[:position])
-	
-	# remaining text for next scan
-	text = text[position:]
-	
+while text:  # that is, while len(text)>0
+
+    # get next token and position after last char recognized
+    token, position = scan(text, td, ad)
+
+    if token == 'ERROR_TOKEN':
+        print('unrecognized input at pos', position + 1, 'of', text)
+        break
+
+    print("token:", token, "string:", text[:position])
+
+    # remaining text for next scan
+    text = text[position:]
